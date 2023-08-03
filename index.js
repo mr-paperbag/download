@@ -90,7 +90,7 @@ const download = (uri, output, options) => {
 		if (!output) {
 			return options.extract && archiveType(data) ? decompress(data, options) : data;
 		}
-		const ext = getFileExtension()
+		const ext = getFileExtension(res, data)
 		const filename = `${options.filename}.${ext}` || filenamify(getFilename(res, data));
 
 		const outputFilepath = path.join(output, filename);
