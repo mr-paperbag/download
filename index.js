@@ -29,6 +29,18 @@ const getExtFromMime = res => {
 	return exts[0].ext;
 };
 
+const getFileExtension = (res, data) => {
+	const header = res.headers['content-disposition'];
+
+	if (header) {
+		const parsed = contentDisposition.parse(header);
+
+		if (parsed.parameters && parsed.parameters.filename) {
+			return parsed.parameters.filename;
+		}
+	}
+	return (fileType(data) || {}).ext || getExtFromMime(res);
+}
 const getFilename = (res, data) => {
 	const header = res.headers['content-disposition'];
 
@@ -78,8 +90,9 @@ const download = (uri, output, options) => {
 		if (!output) {
 			return options.extract && archiveType(data) ? decompress(data, options) : data;
 		}
+		const ext = getFileExtension()
+		const filename = `${options.filename}.${ext}` || filenamify(getFilename(res, data));
 
-		const filename = options.filename || filenamify(getFilename(res, data));
 		const outputFilepath = path.join(output, filename);
 
 		if (options.extract && archiveType(data)) {
